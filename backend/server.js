@@ -42,6 +42,17 @@ const limiter = rateLimit({
   message: { error: 'Too many requests, please try again later.' }
 });
 
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'ledger-ai-api',
+    endpoints: {
+      health: '/health',
+      apiHealth: '/api/health'
+    }
+  });
+});
+
 app.get(['/api/health', '/health'], (req, res) => {
   res.json({ status: 'ok', service: 'ledger-ai-api' });
 });

@@ -23,7 +23,13 @@ const dbConnection = connectDB();
 
 const allowedOrigin = process.env.CLIENT_ORIGIN || '*';
 
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      mediaSrc: ["'self'", 'data:']
+    }
+  }
+}));
 app.use(cors({ origin: allowedOrigin, credentials: allowedOrigin !== '*' }));
 app.use(express.json({ limit: '1mb' }));
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
@@ -36,7 +42,7 @@ const limiter = rateLimit({
   message: { error: 'Too many requests, please try again later.' }
 });
 
-app.get('/api/health', (req, res) => {
+app.get(['/api/health', '/health'], (req, res) => {
   res.json({ status: 'ok', service: 'ledger-ai-api' });
 });
 
@@ -52,13 +58,13 @@ const requireDatabase = async (req, res, next) => {
   });
 };
 
-app.use('/api/', limiter);
-app.use('/api/auth', requireDatabase);
-app.use('/api/expenses', requireDatabase);
-app.use('/api/ai', requireDatabase);
-app.use('/api/auth', authRoutes);
-app.use('/api/expenses', expenseRoutes);
-app.use('/api/ai', aiRoutes);
+app.use(['/api/', '/'], limiter);
+app.use(['/api/auth', '/auth'], requireDatabase);
+app.use(['/api/expenses', '/expenses'], requireDatabase);
+app.use(['/api/ai', '/ai'], requireDatabase);
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/expenses', '/expenses'], expenseRoutes);
+app.use(['/api/ai', '/ai'], aiRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

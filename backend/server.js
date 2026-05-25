@@ -4,8 +4,12 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
-// Load environment from project root .env so backend run from /backend finds vars
-require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
+const dotenv = require('dotenv');
+
+// Keep the existing root .env behavior, then allow backend/.env to fill any
+// missing values for developers who configure each app directory separately.
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const { connectDB, isDBConnected } = require('./config/db');
 const authRoutes = require('./routes/authRoutes');

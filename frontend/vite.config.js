@@ -15,6 +15,11 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path // Keep the path as is for API routing
         }
       }
+    },
+    build: {
+      // Increase chunk warning limit to avoid Vercel/Vite warnings for large bundles
+      // value is in KB (e.g., 2000 = 2MB)
+      chunkSizeWarningLimit: 2000
     }
   };
 });

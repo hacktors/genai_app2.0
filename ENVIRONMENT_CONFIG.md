@@ -10,14 +10,18 @@ project-root/
 |-- .env.example
 |-- .env.production.example
 |-- backend/
+|   |-- .env.example
+|   `-- .env.production.example
 `-- frontend/
+    |-- .env.example
+    |-- .env.development.example
     |-- .env.development
     `-- .env.production.example
 ```
 
 ## Backend Variables
 
-Defined in the root `.env` file:
+Defined in the root `.env` file for the existing local workflow. You can also use `backend/.env`; root values take precedence when both files exist.
 
 | Variable | Required | Purpose |
 | --- | --- | --- |

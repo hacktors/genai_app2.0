@@ -1,7 +1,13 @@
 const Expense = require('../models/Expense');
+const memoryStore = require('../services/memoryStore');
 
 exports.createExpense = async (req, res, next) => {
   try {
+    if (req.useMemoryStore) {
+      const expense = await memoryStore.createExpense(req.user._id, req.body);
+      return res.status(201).json(expense);
+    }
+
     const expenseData = { ...req.body, userId: req.user._id };
     const expense = await Expense.create(expenseData);
     return res.status(201).json(expense);
@@ -12,6 +18,11 @@ exports.createExpense = async (req, res, next) => {
 
 exports.getExpenses = async (req, res, next) => {
   try {
+    if (req.useMemoryStore) {
+      const result = await memoryStore.getExpenses(req.user._id, req.query);
+      return res.json(result);
+    }
+
     const { category, search, sortBy, page = 1, limit = 10 } = req.query;
     const currentPage = Math.max(Number(page) || 1, 1);
     const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 100);
@@ -40,6 +51,16 @@ exports.getExpenses = async (req, res, next) => {
 
 exports.updateExpense = async (req, res, next) => {
   try {
+    if (req.useMemoryStore) {
+      const expense = await memoryStore.updateExpense(req.user._id, req.params.id, req.body);
+
+      if (!expense) {
+        return res.status(404).json({ error: 'Resource context unmapped or unavailable.' });
+      }
+
+      return res.json(expense);
+    }
+
     const expense = await Expense.findOneAndUpdate(
       { _id: req.params.id, userId: req.user._id },
       req.body,
@@ -58,6 +79,16 @@ exports.updateExpense = async (req, res, next) => {
 
 exports.deleteExpense = async (req, res, next) => {
   try {
+    if (req.useMemoryStore) {
+      const deleted = await memoryStore.deleteExpense(req.user._id, req.params.id);
+
+      if (!deleted) {
+        return res.status(404).json({ error: 'Resource destruction target not found.' });
+      }
+
+      return res.json({ message: 'Resource cleanly dropped from cluster.' });
+    }
+
     const expense = await Expense.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
 
     if (!expense) {
@@ -72,6 +103,11 @@ exports.deleteExpense = async (req, res, next) => {
 
 exports.getAnalytics = async (req, res, next) => {
   try {
+    if (req.useMemoryStore) {
+      const analytics = await memoryStore.getAnalytics(req.user._id);
+      return res.json(analytics);
+    }
+
     const breakdown = await Expense.aggregate([
       { $match: { userId: req.user._id } },
       {

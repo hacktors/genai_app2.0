@@ -28,10 +28,11 @@ Defined in the root `.env` file for the existing local workflow. You can also us
 | `PORT` | Local only | Backend port for development |
 | `NODE_ENV` | Yes | `development` or `production` |
 | `CLIENT_ORIGIN` | Yes | Allowed frontend origin for CORS |
-| `MONGO_URI` | Yes | MongoDB connection string |
+| `MONGO_URI` or `MONGODB_URI` | Yes | MongoDB connection string |
 | `JWT_SECRET` | Yes | JWT signing secret |
 | `GEMINI_API_KEY` | Yes | Gemini API key |
 | `GEMINI_MODEL` | No | Defaults to `gemini-2.0-flash` |
+| `DEV_MEMORY_STORE` | Local only | Set to `false` to disable the local in-memory fallback when MongoDB is unavailable |
 
 ## Frontend Variables
 
@@ -58,7 +59,7 @@ CLIENT_ORIGIN=http://localhost:5173
 MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/ledger_ai
 JWT_SECRET=replace-with-a-long-random-secret
 GEMINI_API_KEY=replace-with-your-google-gemini-api-key
-GEMINI_MODEL=gemini-2.0-flash
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
 Commands:
@@ -79,7 +80,7 @@ CLIENT_ORIGIN=https://your-project.vercel.app
 MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/ledger_ai
 JWT_SECRET=replace-with-a-long-random-secret
 GEMINI_API_KEY=replace-with-your-google-gemini-api-key
-GEMINI_MODEL=gemini-2.0-flash
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
 Notes:
@@ -106,3 +107,4 @@ MongoDB connection errors:
 - Check Atlas username and password
 - Check the database IP/network allowlist
 - Confirm the connection string is valid
+- In local development, the API uses an in-memory fallback after MongoDB connection failure unless `DEV_MEMORY_STORE=false`

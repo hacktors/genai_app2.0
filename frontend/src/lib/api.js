@@ -1,8 +1,40 @@
 import axios from 'axios';
 
+const apiBaseURL = (import.meta.env?.VITE_BACKEND_URL || '').replace(/\/api\/?$/, '');
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL || ''
+  baseURL: apiBaseURL
 });
+
+const stringifyErrorValue = (value, fallback) => {
+  if (!value) return fallback;
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (Array.isArray(value)) {
+    const messages = value
+      .map((entry) => stringifyErrorValue(entry, ''))
+      .filter(Boolean);
+    return messages.length ? messages.join(' ') : fallback;
+  }
+  if (typeof value === 'object') {
+    if (value.message) return stringifyErrorValue(value.message, fallback);
+    if (value.error) return stringifyErrorValue(value.error, fallback);
+    if (value.code) return stringifyErrorValue(value.code, fallback);
+
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return fallback;
+    }
+  }
+
+  return fallback;
+};
+
+export const getApiErrorMessage = (error, fallback = 'Request failed.') => {
+  const payload = error?.response?.data;
+  return stringifyErrorValue(payload?.error ?? payload?.message ?? payload ?? error?.message, fallback);
+};
 
 const getStoredToken = () => {
   try {

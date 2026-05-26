@@ -27,7 +27,7 @@ const AppLayout = ({ children }) => {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true }}>
         <AppLayout>
           <Routes>
             <Route path="/login" element={<Login />} />

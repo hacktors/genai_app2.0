@@ -1,7 +1,7 @@
 import { Filter, Search, Trash2 } from 'lucide-react';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import api from '../lib/api';
+import api, { getApiErrorMessage } from '../lib/api';
 
 const categories = ['Food', 'Travel', 'Entertainment', 'Shopping', 'Medical', 'Education', 'Utilities', 'Bills', 'Groceries', 'Others'];
 
@@ -22,7 +22,7 @@ const ExpenseManager = () => {
       });
       setExpenses(res.data.expenses);
     } catch (err) {
-      setError(err.response?.data?.error || 'Expense synchronization failed.');
+      setError(getApiErrorMessage(err, 'Expense synchronization failed.'));
     } finally {
       setLoading(false);
     }
@@ -37,7 +37,7 @@ const ExpenseManager = () => {
       await api.delete(`/api/expenses/${id}`);
       fetchExpenses();
     } catch (err) {
-      setError(err.response?.data?.error || 'Deletion failed.');
+      setError(getApiErrorMessage(err, 'Deletion failed.'));
     }
   };
 

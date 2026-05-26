@@ -18,8 +18,9 @@ const aiRoutes = require('./routes/aiRoutes');
 const { errorHandler, notFound } = require('./middlewares/errorHandler');
 
 const app = express();
+let usingDevMemoryStore = false;
 
-const dbConnection = connectDB();
+connectDB();
 
 const allowedOrigin = process.env.CLIENT_ORIGIN || '*';
 
@@ -58,14 +59,27 @@ app.get(['/api/health', '/health'], (req, res) => {
 });
 
 const requireDatabase = async (req, res, next) => {
+  if (usingDevMemoryStore) {
+    req.useMemoryStore = true;
+    return next();
+  }
+
   if (isDBConnected()) return next();
 
-  await dbConnection.catch(() => null);
+  if (process.env.NODE_ENV !== 'production' && process.env.DEV_MEMORY_STORE !== 'false') {
+    usingDevMemoryStore = true;
+    req.useMemoryStore = true;
+    console.warn('MongoDB unavailable. Using in-memory development store for this server process.');
+    connectDB();
+    return next();
+  }
+
+  await connectDB();
 
   if (isDBConnected()) return next();
 
   return res.status(503).json({
-    error: 'Database unavailable. Check MONGO_URI, MongoDB Atlas network access, and database credentials.'
+    error: 'Database unavailable. Check MONGO_URI or MONGODB_URI, MongoDB Atlas network access, and database credentials.'
   });
 };
 
@@ -83,14 +97,14 @@ app.use(errorHandler);
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT;
   if (!PORT) {
-    console.error('ERROR: PORT environment variable is not set. Please ensure .env file contains PORT=<value>');
-    process.exit(1);
+    console.warn('PORT environment variable is not set. Falling back to PORT=5000.');
   }
-  const server = app.listen(PORT, () => console.log(`Server executing smoothly on port ${PORT}`));
+  const port = PORT || 5000;
+  const server = app.listen(port, () => console.log(`Server executing smoothly on port ${port}`));
 
   server.on('error', (error) => {
     if (error.code === 'EADDRINUSE') {
-      console.error(`ERROR: Port ${PORT} is already in use. Stop the existing backend process or set a different PORT in .env.`);
+      console.error(`ERROR: Port ${port} is already in use. Stop the existing backend process or set a different PORT in .env.`);
       process.exit(1);
     }
 

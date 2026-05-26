@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import api from '../lib/api';
+import api, { getApiErrorMessage } from '../lib/api';
 
 const Login = () => {
   const { register, handleSubmit } = useForm();
@@ -19,7 +19,7 @@ const Login = () => {
       loginSession(res.data);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || 'Authentication failure.');
+      setError(getApiErrorMessage(err, 'Authentication failure.'));
     } finally {
       setSubmitting(false);
     }

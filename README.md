@@ -40,7 +40,7 @@ CLIENT_ORIGIN=http://localhost:5173
 MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/ledger_ai
 JWT_SECRET=replace-with-a-long-random-secret
 GEMINI_API_KEY=replace-with-your-google-gemini-api-key
-GEMINI_MODEL=gemini-2.0-flash
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
 3. Fill `frontend/.env.development`:
@@ -84,7 +84,7 @@ CLIENT_ORIGIN=https://your-project.vercel.app
 MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/ledger_ai
 JWT_SECRET=replace-with-a-long-random-secret
 GEMINI_API_KEY=replace-with-your-google-gemini-api-key
-GEMINI_MODEL=gemini-2.0-flash
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
 Notes:
@@ -98,5 +98,6 @@ Notes:
 - Ensure MongoDB network access allows Vercel
 - Add your deployed Vercel domain to MongoDB Atlas allowlists if required
 - Verify `/api/health` after deploy
+- Local development falls back to an in-memory store when MongoDB is unavailable. Set `DEV_MEMORY_STORE=false` if you want local auth and CRUD routes to fail instead of using that fallback.
 
 More environment details are in [ENVIRONMENT_CONFIG.md](./ENVIRONMENT_CONFIG.md).

@@ -2,7 +2,7 @@ import { CheckCircle, Cpu, Upload } from 'lucide-react';
 import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import api from '../lib/api';
+import api, { getApiErrorMessage } from '../lib/api';
 
 const categories = ['Food', 'Travel', 'Entertainment', 'Shopping', 'Medical', 'Education', 'Utilities', 'Bills', 'Groceries', 'Others'];
 const paymentMethods = ['Cash', 'Card', 'UPI', 'NetBanking', 'Other'];
@@ -29,7 +29,7 @@ const UploadBill = () => {
       const res = await api.post('/api/ai/analyze', formData);
       setExtractedData(res.data);
     } catch (err) {
-      setError(err.response?.data?.error || 'AI receipt analysis failed.');
+      setError(getApiErrorMessage(err, 'AI receipt analysis failed.'));
     } finally {
       setAnalyzing(false);
     }
@@ -42,7 +42,7 @@ const UploadBill = () => {
       await api.post('/api/expenses', extractedData);
       navigate('/expenses');
     } catch (err) {
-      setError(err.response?.data?.error || 'Database commit failed.');
+      setError(getApiErrorMessage(err, 'Database commit failed.'));
     } finally {
       setSaving(false);
     }

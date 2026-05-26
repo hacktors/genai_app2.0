@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import api from '../lib/api';
+import api, { getApiErrorMessage } from '../lib/api';
 
 const Register = () => {
   const { register, handleSubmit } = useForm();
@@ -19,7 +19,7 @@ const Register = () => {
       loginSession(res.data);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration internal failure.');
+      setError(getApiErrorMessage(err, 'Registration internal failure.'));
     } finally {
       setSubmitting(false);
     }

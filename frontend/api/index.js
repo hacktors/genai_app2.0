@@ -1,3 +1,24 @@
-import app from '../../backend/server.js';
+import { createRequire } from 'module';
 
-export default app;
+const require = createRequire(import.meta.url);
+
+const loadBackend = () => {
+  const candidates = [
+    '../../backend/server.js',
+    '../backend/server.js',
+    './backend/server.js'
+  ];
+  const errors = [];
+
+  for (const candidate of candidates) {
+    try {
+      return require(candidate);
+    } catch (error) {
+      errors.push(`${candidate}: ${error.message}`);
+    }
+  }
+
+  throw new Error(`Unable to load backend server. Tried: ${errors.join(' | ')}`);
+};
+
+export default loadBackend();
